@@ -5,6 +5,7 @@ import com.tema1.goods.GoodsFactory;
 import com.tema1.helpers.HashtableElement;
 import com.tema1.helpers.HashtableElementComparator;
 import com.tema1.helpers.Stash;
+import com.tema1.helpers.StashResult;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -13,7 +14,7 @@ import java.util.Set;
 
 public class BasePlayer extends Player {
     public BasePlayer(int id) {
-        super(id);
+        super(id, 0);
     }
 
     public Stash prepareStash() {
@@ -52,6 +53,17 @@ public class BasePlayer extends Player {
             for (int i = 1; i <= bestCard.getFrequency() && i <= 8; i++) {cardsForStash.add(GoodsFactory.getInstance().getGoodsById(bestCard.getCardID())); declaration = bestCard.getCardID();}
         }
         return new Stash(0, cardsForStash, declaration);
+    }
+
+    public StashResult takeTurn(ArrayList<Integer> deck, int roundNumber) {
+        this.pick10cards(deck);
+        Stash stash = this.prepareStash();
+        StashResult stashResult = stash.checkOrCompute(false);
+        for (Goods good:stashResult.allowed) {
+            this.shop.add(good);
+        }
+        this.burnCards();
+        return stashResult;
     }
 
     public boolean isBriber() {return false;}

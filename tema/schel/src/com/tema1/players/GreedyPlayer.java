@@ -5,6 +5,7 @@ import com.tema1.goods.GoodsFactory;
 import com.tema1.helpers.HashtableElement;
 import com.tema1.helpers.HashtableElementComparator;
 import com.tema1.helpers.Stash;
+import com.tema1.helpers.StashResult;
 
 import java.util.ArrayList;
 import java.util.Hashtable;
@@ -12,7 +13,7 @@ import java.util.Set;
 
 public class GreedyPlayer extends Player {
     public GreedyPlayer(int id) {
-        super(id);
+        super(id, 1);
     }
 
     public Stash prepareStash(int roundNumber) {
@@ -53,6 +54,17 @@ public class GreedyPlayer extends Player {
         // daca in rundele pare are si o carte ilegala, o baga
         if (!addedIllegal && cardsForStash.size() < 8 && roundNumber % 2 == 0 && bestIllegalID != -1) cardsForStash.add(GoodsFactory.getInstance().getGoodsById(bestIllegalID));
         return new Stash(0, cardsForStash, declaration);
+    }
+
+    public StashResult takeTurn(ArrayList<Integer> deck, int roundNumber) {
+        this.pick10cards(deck);
+        Stash stash = this.prepareStash(roundNumber);
+        StashResult stashResult = stash.checkOrCompute(false);
+        for (Goods good:stashResult.allowed) {
+            this.shop.add(good);
+        }
+        this.burnCards();
+        return stashResult;
     }
 
     public boolean isBriber() {return false;}

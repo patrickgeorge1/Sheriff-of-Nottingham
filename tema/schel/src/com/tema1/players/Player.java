@@ -4,16 +4,20 @@ import com.tema1.goods.Goods;
 import com.tema1.goods.GoodsFactory;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class Player {
     protected int id;
     protected int money = 80;
+    protected int type;
     protected ArrayList<Goods> cards = new ArrayList<Goods>();
+    protected ArrayList<Goods> shop = new ArrayList<Goods>();
 
     public int getMoney() {
         return money;
     }
+    public int getType() { return type; }
 
     public void setMoney(int money) {
         this.money = money;
@@ -33,8 +37,9 @@ public class Player {
         this.cards = cards;
     }
 
-    public Player(int id) {
+    public Player(int id, int type) {
         this.id = id;
+        this.type = type;
     }
 
     public void pick10cards(ArrayList<Integer> deck) {
@@ -50,4 +55,23 @@ public class Player {
     }
 
     public int getId() {return id;}
+
+    public ArrayList<Integer> getBriberNeigbours(int numberOfPlayers) {
+        int next = (this.getId() + 1) % numberOfPlayers;
+        int previous = this.getId() - 1;
+        if (previous < 0) previous = numberOfPlayers - 1;
+        return new ArrayList<Integer>(Arrays.asList(previous, next));
+    }
+
+    public boolean isProfitLower16() {
+        return this.money < 16;
+    }
+
+    public boolean isProfitZero() {
+        return this.money == 0;
+    }
+
+    public boolean isProfitLowerX(int x) {
+        return this.money < x;
+    }
 }
