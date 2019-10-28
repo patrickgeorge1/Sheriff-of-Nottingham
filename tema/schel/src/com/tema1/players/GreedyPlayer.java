@@ -37,8 +37,8 @@ public class GreedyPlayer extends Player {
         }
 
         ArrayList<Goods> cardsForStash = new ArrayList<Goods>();
-        int declaration = 0;
-        if (cardsParsed.size() == 0) {cardsForStash.add(GoodsFactory.getInstance().getGoodsById(bestIllegalID));}
+        int declaration = 0; boolean addedIllegal = false;
+        if (cardsParsed.size() == 0) {cardsForStash.add(GoodsFactory.getInstance().getGoodsById(bestIllegalID)); addedIllegal = true;}
         else {
             HashtableElement bestCard  = cardsParsed.get(cardsParsed.keySet().toArray()[0]);
             declaration = bestCard.getCardID();
@@ -48,8 +48,12 @@ public class GreedyPlayer extends Player {
                 HashtableElement currentCard = cardsParsed.get(key);
                 if (comparator.compare(bestCard, currentCard) < 0) bestCard = currentCard;
             }
-            for (int i = 1; i <= bestCard.getFrequency(); i++) {cardsForStash.add(GoodsFactory.getInstance().getGoodsById(bestCard.getCardID())); declaration = bestCard.getCardID();}
+            for (int i = 1; i <= bestCard.getFrequency() && i <= 8; i++) {cardsForStash.add(GoodsFactory.getInstance().getGoodsById(bestCard.getCardID())); declaration = bestCard.getCardID();}
         }
+        // daca in rundele pare are si o carte ilegala, o baga
+        if (!addedIllegal && cardsForStash.size() < 8 && roundNumber % 2 == 0 && bestIllegalID != -1) cardsForStash.add(GoodsFactory.getInstance().getGoodsById(bestIllegalID));
         return new Stash(0, cardsForStash, declaration);
     }
+
+    public boolean isBriber() {return false;}
 }

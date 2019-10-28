@@ -6,6 +6,7 @@ import com.tema1.goods.IllegalGoods;
 import com.tema1.helpers.Stash;
 import com.tema1.helpers.StashResult;
 import com.tema1.players.BasePlayer;
+import com.tema1.players.GreedyPlayer;
 import com.tema1.players.Player;
 
 import java.util.ArrayList;
@@ -30,9 +31,15 @@ public final class Main {
         ArrayList<Integer> deck = new ArrayList<Integer>(gameInput.getAssetIds());
 
         GoodsFactory goodsType = GoodsFactory.getInstance();
-        Player first = new BasePlayer(0);
+        Player first = new GreedyPlayer(0);
         first.pick10cards(deck);
 
 
+
+        System.out.println(first.getCards());
+        Stash stash = ((GreedyPlayer) first).prepareStash(2);
+        System.out.println(stash.getCards());
+        StashResult result = stash.checkOrCompute(false);
+        System.out.println(result.getsProfit());
     }
 }

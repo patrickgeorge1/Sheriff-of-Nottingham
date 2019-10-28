@@ -49,8 +49,10 @@ public class BasePlayer extends Player {
                 HashtableElement currentCard = cardsParsed.get(key);
                 if (comparator.compare(bestCard, currentCard) < 0) bestCard = currentCard;
             }
-            for (int i = 1; i <= bestCard.getFrequency(); i++) {cardsForStash.add(GoodsFactory.getInstance().getGoodsById(bestCard.getCardID())); declaration = bestCard.getCardID();}
+            for (int i = 1; i <= bestCard.getFrequency() && i <= 8; i++) {cardsForStash.add(GoodsFactory.getInstance().getGoodsById(bestCard.getCardID())); declaration = bestCard.getCardID();}
         }
         return new Stash(0, cardsForStash, declaration);
     }
+
+    public boolean isBriber() {return false;}
 }
