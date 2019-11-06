@@ -1,15 +1,11 @@
 package com.tema1.game;
 
 import com.tema1.goods.Goods;
+import com.tema1.goods.GoodsFactory;
 import com.tema1.helpers.StashResult;
-import com.tema1.players.BasePlayer;
-import com.tema1.players.BriberPlayer;
-import com.tema1.players.GreedyPlayer;
-import com.tema1.players.Player;
+import com.tema1.players.*;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 public class Game {
     private int numberOfRounds;
@@ -31,7 +27,7 @@ public class Game {
     }
 
     public void playSubroundWithSheriiff(int x, int roundNumber) {
-        System.out.println("Sheriff " + x);
+//        System.out.println("Sheriff " + x);
         for (int i = 0; i < numberOfPlayers; i++) {
             if (i != x) {
                 Player p = this.players.get(i);
@@ -56,10 +52,44 @@ public class Game {
     }
 
     public void play() {
+        // joaca rundele
         for (int round = 1; round <= numberOfRounds; round++) {
-            System.out.println(" ------------  Round " + round + "  ------------");
+//            System.out.println(" ------------  Round " + round + "  ------------");
             playRound(round);
         }
+
+
+
+        // sterg bunuri ilegale, si fac profit carti, fara bonus king si queen
+        for (int i = 0; i < numberOfPlayers; i++) {
+            Player p = this.players.get(i);
+            p.computeProfit();
+        }
+
+        // adaug bonusiri pe king si queen
+        Map<Integer, ArrayList<Integer>> kingAndQuuen = GoodsFactory.getKingAndQueen(numberOfPlayers);
+        for (Integer card:kingAndQuuen.keySet()) {
+            ArrayList<Integer> kandq = kingAndQuuen.get(card);
+            if (kandq.size() > 0) {
+                // dau bonus la king
+                int king = kandq.get(0);
+                players.get(king).updateProfitByBonus(GoodsFactory.getBonusFor(card, "king"));
+                if (kandq.size() == 2) {
+                    // dau bonus la quuen
+                    int queen = kandq.get(1);
+                    players.get(queen).updateProfitByBonus(GoodsFactory.getBonusFor(card, "queen"));
+                }
+            }
+        }
+
+        // fac clasament
+        PlayerComparator playerComparator = new PlayerComparator();
+        Collections.sort(players, playerComparator);
+        for (Player player:players) {
+            System.out.println(player.getId() + " " + Player.typeConversion.get(player.getType()) + " " + player.getProfitByBonus());
+        }
+
+//        System.out.println(GoodsFactory.cardStats);
     }
 
 }

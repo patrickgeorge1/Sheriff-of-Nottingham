@@ -1,5 +1,9 @@
 package com.tema1.goods;
 
+import com.tema1.helpers.Tuple;
+
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -7,6 +11,90 @@ public final class GoodsFactory {
     private static GoodsFactory instance = null;
     private static final int ILLEGAL_PENALTY = 4;
     private static final int LEGAL_PENALTY = 2;
+    // Constante pentru conversie bunuri ilegale
+    static Map<Integer, ArrayList<ArrayList<Integer>>> illegalConversion = new HashMap<>() {{
+        put(20, new ArrayList<ArrayList<Integer>>(){{add(new ArrayList<>() {{add(3); add(1);}});}});
+        put(21, new ArrayList<ArrayList<Integer>>(){{add(new ArrayList<>() {{add(2); add(3);}});}});
+        put(22, new ArrayList<ArrayList<Integer>>(){{add(new ArrayList<>() {{add(2); add(2);}});}});
+        put(23, new ArrayList<ArrayList<Integer>>(){{add(new ArrayList<>() {{add(4); add(7);}});}});
+        put(24, new ArrayList<ArrayList<Integer>>(){{add(new ArrayList<>() {{add(2); add(4);}}); add(new ArrayList<>() {{add(3); add(6);}}); add(new ArrayList<>(){{add(1); add(3);}});}});
+    }};
+
+    static Map<Integer, ArrayList<Integer>> kingAndQuuenBonus = new HashMap<>() {{
+        put(0, new ArrayList<Integer>() {{add(20); add(10);}});
+        put(1, new ArrayList<Integer>() {{add(19); add(9);}});
+        put(2, new ArrayList<Integer>() {{add(18); add(9);}});
+        put(3, new ArrayList<Integer>() {{add(17); add(8);}});
+        put(4, new ArrayList<Integer>() {{add(16); add(7);}});
+        put(5, new ArrayList<Integer>() {{add(15); add(6);}});
+        put(6, new ArrayList<Integer>() {{add(14); add(5);}});
+        put(7, new ArrayList<Integer>() {{add(13); add(4);}});
+        put(8, new ArrayList<Integer>() {{add(12); add(3);}});
+        put(9, new ArrayList<Integer>() {{add(11); add(2);}});
+    }};
+
+    public static int getBonusFor(int card, String role) {
+        ArrayList<Integer> bonus = kingAndQuuenBonus.get(card);
+        if (role.equals("king")) {return bonus.get(0);}
+        return bonus.get(1);
+    }
+
+    // Dau id carte ilgala si primesc cartile echivalente
+    public Tuple computeIllegal(int id) {
+        ArrayList<ArrayList<Integer>> exchange = illegalConversion.get(id);
+        int profit = GoodsFactory.getInstance().getGoodsById(id).getProfit();
+        return new Tuple(profit, exchange);
+    }
+
+    public static Map<Integer, ArrayList<Integer>> cardStats = new HashMap<>() {{
+        put(0, new ArrayList<Integer>());
+        put(1, new ArrayList<Integer>());
+        put(2, new ArrayList<Integer>());
+        put(3, new ArrayList<Integer>());
+        put(4, new ArrayList<Integer>());
+        put(5, new ArrayList<Integer>());
+        put(6, new ArrayList<Integer>());
+        put(7, new ArrayList<Integer>());
+        put(8, new ArrayList<Integer>());
+        put(9, new ArrayList<Integer>());
+    }};
+
+    public static Map<Integer, ArrayList<Integer>> getKingAndQueen(int numberOfPlayers) {
+        Map<Integer, ArrayList<Integer>> cardWithKingAndQueen = new HashMap<>();
+        for (int cardAsKey:cardStats.keySet()) {
+            ArrayList<Integer> playersForCard = cardStats.get(cardAsKey);
+            int king = -1;
+            int queen = -1;
+            Map <Integer, Integer> corelation = new HashMap<>();
+            for (int player:playersForCard) {
+                if (!corelation.containsKey(player)) {
+                    corelation.put(player, 0);
+                }
+                corelation.put(player, corelation.get(player) + 1);
+            }
+            // DACA AVEM PRETENDENTI PT QUUEN SI KING
+            if (!corelation.isEmpty()) {
+                int maxValueInMap=(Collections.max(corelation.values()));
+                for (int i = 0; i < numberOfPlayers; i++) {
+                    if(corelation.containsKey(i) && corelation.get(i) == maxValueInMap) {king = i; break;}
+                }
+                corelation.remove(king);
+                if (!corelation.isEmpty()) {
+                    maxValueInMap=(Collections.max(corelation.values()));
+                    for (int i = 0; i < numberOfPlayers; i++) {
+                        if(corelation.containsKey(i) && corelation.get(i) == maxValueInMap) {queen = i; break;}
+                    }
+                }
+            }
+            // acum am pe king si pe queen
+            ArrayList<Integer> kandq = new ArrayList<>();
+            if (king != -1) kandq.add(king);
+            if (queen != -1) kandq.add(queen);
+            cardWithKingAndQueen.put(cardAsKey, kandq);
+        }
+
+        return cardWithKingAndQueen;
+    }
 
     private static class IllegalGoodsIds {
         public static final int SILK = 20;
